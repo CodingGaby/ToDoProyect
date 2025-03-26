@@ -14,7 +14,7 @@ namespace ToDoProyect
 {
     public partial class MainPage: Form
     {
-        SqlConnection conx = new SqlConnection("Data Source=LAPTOP-P6SV6G8N;Initial Catalog=ToDoProyect;Integrated Security=True;Encrypt=False");
+        SqlConnection conx = new SqlConnection(Program.getConnectionString());
         public MainPage()
         {
             InitializeComponent();
@@ -25,16 +25,13 @@ namespace ToDoProyect
             ValidarUsuario(txtUser.Text, txtPassword.Text);
         }
 
-        private void ValidarUsuario(string usuario, string passw)
+        private void ValidarUsuario(string user, string passw)
         {
             try
             {
                 conx.Open();
 
-                SqlCommand consult = new SqlCommand("Select NomUsuario, Id_Rol FROM Usuarios Where NomUsuario = @usua and Contra = @pass", conx);
-
-                consult.Parameters.AddWithValue("usua", usuario);
-                consult.Parameters.AddWithValue("pass", passw);
+                SqlCommand consult = new SqlCommand($"SELECT username, idRole FROM users Where username = '{user}' and password = '{passw}'", conx);
 
                 SqlDataAdapter sd = new SqlDataAdapter(consult);
 

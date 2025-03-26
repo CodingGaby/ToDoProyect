@@ -39,7 +39,7 @@
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(13, 13);
+            this.label1.Location = new System.Drawing.Point(22, 9);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(119, 25);
             this.label1.TabIndex = 0;
@@ -47,7 +47,7 @@
             // 
             // bttAddUser
             // 
-            this.bttAddUser.Location = new System.Drawing.Point(18, 62);
+            this.bttAddUser.Location = new System.Drawing.Point(40, 106);
             this.bttAddUser.Name = "bttAddUser";
             this.bttAddUser.Size = new System.Drawing.Size(75, 23);
             this.bttAddUser.TabIndex = 1;
@@ -57,7 +57,7 @@
             // 
             // bttProjects
             // 
-            this.bttProjects.Location = new System.Drawing.Point(139, 62);
+            this.bttProjects.Location = new System.Drawing.Point(40, 68);
             this.bttProjects.Name = "bttProjects";
             this.bttProjects.Size = new System.Drawing.Size(75, 23);
             this.bttProjects.TabIndex = 2;
@@ -67,7 +67,7 @@
             // 
             // bttActivity
             // 
-            this.bttActivity.Location = new System.Drawing.Point(270, 62);
+            this.bttActivity.Location = new System.Drawing.Point(40, 146);
             this.bttActivity.Name = "bttActivity";
             this.bttActivity.Size = new System.Drawing.Size(75, 23);
             this.bttActivity.TabIndex = 3;
@@ -77,19 +77,21 @@
             // 
             // bttLogOut
             // 
-            this.bttLogOut.Location = new System.Drawing.Point(18, 120);
+            this.bttLogOut.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.bttLogOut.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
+            this.bttLogOut.Location = new System.Drawing.Point(27, 223);
             this.bttLogOut.Name = "bttLogOut";
             this.bttLogOut.Size = new System.Drawing.Size(114, 23);
             this.bttLogOut.TabIndex = 4;
             this.bttLogOut.Text = "Cerrar Sesion";
-            this.bttLogOut.UseVisualStyleBackColor = true;
+            this.bttLogOut.UseVisualStyleBackColor = false;
             this.bttLogOut.Click += new System.EventHandler(this.bttLogOut_Click);
             // 
             // AdminPage
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(455, 167);
+            this.ClientSize = new System.Drawing.Size(157, 258);
             this.Controls.Add(this.bttLogOut);
             this.Controls.Add(this.bttActivity);
             this.Controls.Add(this.bttProjects);

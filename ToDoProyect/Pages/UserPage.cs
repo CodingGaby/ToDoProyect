@@ -12,17 +12,17 @@ using System.Windows.Forms;
 
 namespace ToDoProyect
 {
-
-    public partial class UserPage: Form
+    public partial class UserPage : Form
     {
-        string con = "Data Source=LAPTOP-P6SV6G8N;Initial Catalog=ToDoProyect;Integrated Security=True;Encrypt=False";
+        string con = Program.getConnectionString();
 
         public UserPage(string v)
         {
             InitializeComponent();
             lblUser.Text = v;
         }
-        private void Limpieza()
+
+        private void CleanInputs()
         {
             txtId.Text = string.Empty;
             txtName.Text = string.Empty;
@@ -36,15 +36,15 @@ namespace ToDoProyect
 
         private bool _VerifyData()
         {
+            // Expresión regular para el formato dd/MM/yyyy
             string regexDate = @"^\b(0[1-9]|[12][0-9]|3[01])/(0[1-9]|1[0-2])/([0-9]{4})\b$";
 
-            bool ValidDateIn = Regex.IsMatch(txtDateIn.Text, regexDate);
-            bool ValidDateLast = Regex.IsMatch(txtDateLast.Text, regexDate);
+            bool validDateIn = Regex.IsMatch(txtDateIn.Text, regexDate);
+            bool validDateLast = Regex.IsMatch(txtDateLast.Text, regexDate);
 
-            if ( !ValidDateIn || !ValidDateIn )
+            if (!validDateIn || !validDateLast)
             {
-                MessageBox.Show("Formato de Fecha Erroneo", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-
+                MessageBox.Show("Formato de Fecha Erróneo", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
 
@@ -53,19 +53,19 @@ namespace ToDoProyect
 
         private void dataView_CellClick(object sender, DataGridViewCellEventArgs e)
         {
-            if ( e.RowIndex >= 0 )
+            if (e.RowIndex >= 0)
             {
-                var row = dataView.Rows[ e.RowIndex ];
+                var row = dataView.Rows[e.RowIndex];
 
                 // Verificar si las celdas no son null antes de asignar
-                txtId.Text = row.Cells[ "ID" ]?.Value?.ToString() ?? string.Empty;
-                txtName.Text = row.Cells[ "Nombre de la Actividad" ]?.Value?.ToString() ?? string.Empty;
-                txtDateIn.Text = row.Cells[ "Fecha ingreso" ]?.Value?.ToString() ?? string.Empty;
-                txtDateLast.Text = row.Cells[ "Fecha entrega" ]?.Value?.ToString() ?? string.Empty;
-                txtDescription.Text = row.Cells[ "Descripcion" ]?.Value?.ToString() ?? string.Empty;
-                txtUrl.Text = row.Cells[ "URL del Documento" ]?.Value?.ToString() ?? string.Empty;
-                txtProject.Text = row.Cells[ "Nombre del Proyecto" ]?.Value?.ToString() ?? string.Empty;
-                txtStatus.Text = row.Cells[ "Estado" ]?.Value?.ToString() ?? string.Empty;
+                txtId.Text = row.Cells["ID"]?.Value?.ToString() ?? string.Empty;
+                txtName.Text = row.Cells["Nombre de la Actividad"]?.Value?.ToString() ?? string.Empty;
+                txtDateIn.Text = row.Cells["Fecha ingreso"]?.Value?.ToString() ?? string.Empty;
+                txtDateLast.Text = row.Cells["Fecha entrega"]?.Value?.ToString() ?? string.Empty;
+                txtDescription.Text = row.Cells["Descripcion"]?.Value?.ToString() ?? string.Empty;
+                txtUrl.Text = row.Cells["URL del Documento"]?.Value?.ToString() ?? string.Empty;
+                txtProject.Text = row.Cells["Nombre del Proyecto"]?.Value?.ToString() ?? string.Empty;
+                txtStatus.Text = row.Cells["Estado"]?.Value?.ToString() ?? string.Empty;
             }
         }
 
@@ -73,88 +73,80 @@ namespace ToDoProyect
         {
             DataTable dt = new DataTable();
 
-            using ( SqlConnection cn = new SqlConnection(con) )
+            using (SqlConnection cn = new SqlConnection(con))
             {
-                SqlDataAdapter da = new SqlDataAdapter($"Select a.Id_Actividad as 'ID', a.Nombre as 'Nombre de la Actividad', a.FechaIn as 'Fecha Ingreso', a.FechaEntrega as 'Fecha Entrega', a.descripcion as 'Descripcion', a.URLDocument as 'URL del Documento', p.Id_Proyecto as 'ID Proyecto', p.Nombre as 'Nombre del Proyecto', e.Nombre as 'Estado' from Actividades a, EstadoActividades e, Proyectos p, Usuarios u where a.Id_Estado = e.Id_Estado AND a.Id_User = u.Id_User AND u.NomUsuario = '{lblUser.Text}' AND a.Id_Proyecto = p.Id_Proyecto", cn);
+                // Consulta adaptada a la nueva estructura de tablas y columnas
+                SqlDataAdapter da = new SqlDataAdapter($@"
+                    SELECT 
+                        a.idActivity       AS 'ID', 
+                        a.name             AS 'Nombre de la Actividad', 
+                        a.startDate        AS 'Fecha ingreso', 
+                        a.deliveryDate     AS 'Fecha entrega', 
+                        a.description      AS 'Descripcion', 
+                        a.urlDocument      AS 'URL del Documento', 
+                        p.idProject        AS 'ID Proyecto', 
+                        p.name             AS 'Nombre del Proyecto', 
+                        e.name             AS 'Estado'
+                    FROM activities a
+                    JOIN activityStates e ON a.idState = e.idState
+                    JOIN projects p      ON a.idProject = p.idProject
+                    JOIN users u         ON a.idUser = u.idUser
+                    WHERE u.username = '{lblUser.Text}'
+                ", cn);
 
                 da.SelectCommand.CommandType = CommandType.Text;
 
                 cn.Open();
-
                 da.Fill(dt);
-
                 dataView.DataSource = dt;
             }
         }
 
         private void bttComplete_Click(object sender, EventArgs e)
         {
-            if ( _VerifyData() )
+            if (_VerifyData())
             {
-
-                using ( SqlConnection cn = new SqlConnection(con) )
+                using (SqlConnection cn = new SqlConnection(con))
                 {
-                    //if ( _VerifyMail() )
-                    //{
-                    SqlCommand cmd = new SqlCommand($"Update Actividades set FechaEntrega = '{txtDateLast.Text}', Id_Estado = 3 WHERE Id_Actividad = {txtId.Text}", cn);
+                    // Cambiamos la actividad a estado 3 (Finalizado) y actualizamos la fecha de entrega
+                    SqlCommand cmd = new SqlCommand($@"
+                        UPDATE activities
+                        SET deliveryDate = '{txtDateLast.Text}', 
+                            idState = 3
+                        WHERE idActivity = {txtId.Text}
+                    ", cn);
 
                     cmd.CommandType = CommandType.Text;
-
                     cn.Open();
-
                     cmd.ExecuteNonQuery();
 
-                    MessageBox.Show("Ejecutado Correctamente", "Exito", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                    Limpieza();
-                    //}
+                    MessageBox.Show("Ejecutado Correctamente", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    CleanInputs();
                 }
             }
         }
 
         private void bttWaiting_Click(object sender, EventArgs e)
         {
-            if ( _VerifyData() )
+            if (_VerifyData())
             {
-
-                using ( SqlConnection cn = new SqlConnection(con) )
+                using (SqlConnection cn = new SqlConnection(con))
                 {
-                    //if ( _VerifyMail() )
-                    //{
-                    SqlCommand cmd = new SqlCommand($"Update Actividades set FechaEntrega = '{txtDateLast.Text}', Id_Estado = 2 WHERE Id_Actividad = {txtId.Text}", cn);
+                    // Cambiamos la actividad a estado 2 (En Espera) y actualizamos la fecha de entrega
+                    SqlCommand cmd = new SqlCommand($@"
+                        UPDATE activities
+                        SET deliveryDate = '{txtDateLast.Text}', 
+                            idState = 2
+                        WHERE idActivity = {txtId.Text}
+                    ", cn);
 
                     cmd.CommandType = CommandType.Text;
-
                     cn.Open();
-
                     cmd.ExecuteNonQuery();
 
-                    MessageBox.Show("Ejecutado Correctamente", "Exito", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                    Limpieza();
-                    //}
+                    MessageBox.Show("Ejecutado Correctamente", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    CleanInputs();
                 }
-            }
-        }
-
-        private void bttURL_Click(object sender, EventArgs e)
-        {
-            using ( SqlConnection cn = new SqlConnection(con) )
-            {
-                //if ( _VerifyMail() )
-                //{
-                SqlCommand cmd = new SqlCommand($"Update Actividades set URLDocument = '{txtUrl.Text}' WHERE Id_Actividad = {txtId.Text}", cn);
-
-                cmd.CommandType = CommandType.Text;
-
-                cn.Open();
-
-                cmd.ExecuteNonQuery();
-
-                MessageBox.Show("Ejecutado Correctamente", "Exito", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                Limpieza();
-                //}
             }
         }
 

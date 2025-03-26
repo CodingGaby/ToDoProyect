@@ -13,13 +13,14 @@ using System.Xml.Linq;
 
 namespace ToDoProyect.Pages.CRUD
 {
-    public partial class ProjectCRUD: Form
+    public partial class ProjectCRUD : Form
     {
-        string con = "Data Source=LAPTOP-P6SV6G8N;Initial Catalog=ToDoProyect;Integrated Security=True;Encrypt=False";
+        string con = Program.getConnectionString();
         public ProjectCRUD()
         {
             InitializeComponent();
         }
+
         private void Limpieza()
         {
             txtId.Text = string.Empty;
@@ -31,43 +32,39 @@ namespace ToDoProyect.Pages.CRUD
 
         private bool _VerifyData()
         {
+            // Expresión regular para el formato dd/MM/yyyy
             string regexDate = @"^\b(0[1-9]|[12][0-9]|3[01])/(0[1-9]|1[0-2])/([0-9]{4})\b$";
 
-            bool ValidDateIn = Regex.IsMatch(txtDateIn.Text, regexDate);
-            bool ValidDateLast = Regex.IsMatch(txtDateLast.Text, regexDate);
+            bool validDateIn = Regex.IsMatch(txtDateIn.Text, regexDate);
+            bool validDateLast = Regex.IsMatch(txtDateLast.Text, regexDate);
 
-            if ( !ValidDateIn || !ValidDateIn )
+            if (!validDateIn || !validDateLast)
             {
-                MessageBox.Show("Formato de Fecha Erroneo", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-
+                MessageBox.Show("Formato de Fecha Erróneo", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
 
             return true;
         }
 
-
         private void ProjectCRUD_Load(object sender, EventArgs e)
         {
-            // TODO: esta línea de código carga datos en la tabla 'toDoProyectDataSet1.EstadosProyectos' Puede moverla o quitarla según sea necesario.
-            this.estadosProyectosTableAdapter.Fill(this.toDoProyectDataSet1.EstadosProyectos);
-
+            // Se carga la información de projectStates desde el DataSet configurado
+            this.estadosProyectosTableAdapter.Fill(this.trelloProyectDBDataSet.projectStates);
         }
 
         private void bttViewData_Click(object sender, EventArgs e)
         {
             DataTable dt = new DataTable();
 
-            using ( SqlConnection cn = new SqlConnection(con) )
+            using (SqlConnection cn = new SqlConnection(con))
             {
-                SqlDataAdapter da = new SqlDataAdapter($"SELECT * FROM ProyectsViews", cn);
-
+                // Se utiliza la vista projectsView
+                SqlDataAdapter da = new SqlDataAdapter("SELECT * FROM projectsView", cn);
                 da.SelectCommand.CommandType = CommandType.Text;
 
                 cn.Open();
-
                 da.Fill(dt);
-
                 dataView.DataSource = dt;
             }
         }
@@ -81,85 +78,84 @@ namespace ToDoProyect.Pages.CRUD
 
         private void bttAdd_Click(object sender, EventArgs e)
         {
-            if ( _VerifyData() )
+            if (_VerifyData())
             {
-
-                using ( SqlConnection cn = new SqlConnection(con) )
+                using (SqlConnection cn = new SqlConnection(con))
                 {
-
-                    SqlCommand cmd = new SqlCommand($"INSERT INTO Proyectos(Nombre, FechaIn, FechaEntrega, descripcion, Id_Estado) VALUES ('{txtName.Text}','{txtDateIn.Text}','{txtDateLast.Text}','{txtDescription.Text}', {cmbEstatus.SelectedIndex + 1})", cn);
-                    cmd.CommandType = CommandType.Text; // Codigo Miss - cmd.CommandType cn = CommandType.Text;
+                    // Inserta en la tabla projects usando los nuevos nombres de columnas
+                    SqlCommand cmd = new SqlCommand($@"
+                        INSERT INTO projects(name, startDate, deliveryDate, description, idState)
+                        VALUES ('{txtName.Text}','{txtDateIn.Text}','{txtDateLast.Text}','{txtDescription.Text}', {cmbEstatus.SelectedIndex + 1})
+                    ", cn);
+                    cmd.CommandType = CommandType.Text;
 
                     cn.Open();
                     cmd.ExecuteNonQuery();
-                    
-                    MessageBox.Show("Ejecutado Correctamente", "Exito", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
+                    MessageBox.Show("Ejecutado Correctamente", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     Limpieza();
-                    
                 }
             }
         }
 
         private void bttModify_Click(object sender, EventArgs e)
         {
-            if ( _VerifyData() )
+            if (_VerifyData())
             {
-
-                using ( SqlConnection cn = new SqlConnection(con) )
+                using (SqlConnection cn = new SqlConnection(con))
                 {
-                    //if ( _VerifyMail() )
-                    //{
-                        SqlCommand cmd = new SqlCommand($"Update Proyectos set Nombre = '{txtName.Text}', FechaIn = '{txtDateIn.Text}', FechaEntrega = '{txtDateLast.Text}', descripcion = '{txtDescription.Text}', Id_Estado = {( cmbEstatus.SelectedIndex + 1 )} WHERE Id_Proyecto = {txtId.Text}", cn);
+                    // Actualiza la información en la tabla projects
+                    SqlCommand cmd = new SqlCommand($@"
+                        UPDATE projects 
+                        SET name = '{txtName.Text}', 
+                            startDate = '{txtDateIn.Text}', 
+                            deliveryDate = '{txtDateLast.Text}', 
+                            description = '{txtDescription.Text}', 
+                            idState = {cmbEstatus.SelectedIndex + 1} 
+                        WHERE idProject = {txtId.Text}
+                    ", cn);
 
-                        cmd.CommandType = CommandType.Text;
+                    cmd.CommandType = CommandType.Text;
+                    cn.Open();
+                    cmd.ExecuteNonQuery();
 
-                        cn.Open();
-
-                        cmd.ExecuteNonQuery();
-
-                        MessageBox.Show("Ejecutado Correctamente", "Exito", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                        Limpieza();
-                    //}
+                    MessageBox.Show("Ejecutado Correctamente", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    Limpieza();
                 }
             }
         }
 
         private void dataView_CellClick(object sender, DataGridViewCellEventArgs e)
         {
-            if ( e.RowIndex >= 0 )
+            if (e.RowIndex >= 0)
             {
-                var row = dataView.Rows[ e.RowIndex ];
+                var row = dataView.Rows[e.RowIndex];
 
-                // Verificar si las celdas no son null antes de asignar
-                txtId.Text = row.Cells[ "ID" ]?.Value?.ToString() ?? string.Empty;
-                txtName.Text = row.Cells[ "Nombre del Proyecto" ]?.Value?.ToString() ?? string.Empty;
-                txtDateIn.Text = row.Cells[ "Fecha ingreso" ]?.Value?.ToString() ?? string.Empty;
-                txtDateLast.Text = row.Cells[ "Fecha entrega" ]?.Value?.ToString() ?? string.Empty;
-                txtDescription.Text = row.Cells[ "Descripcion" ]?.Value?.ToString() ?? string.Empty;
-
-                if ( int.TryParse(row.Cells[ "Estado" ]?.Value?.ToString(), out int statusId) )
-                {
-                    cmbEstatus.SelectedIndex = statusId - 1;
-                }
+                // Se utilizan los alias de la vista projectsView:
+                txtId.Text = row.Cells["ID"]?.Value?.ToString() ?? string.Empty;
+                txtName.Text = row.Cells["Project Name"]?.Value?.ToString() ?? string.Empty;
+                txtDateIn.Text = row.Cells["Start Date"]?.Value?.ToString() ?? string.Empty;
+                txtDateLast.Text = row.Cells["Delivery Date"]?.Value?.ToString() ?? string.Empty;
+                txtDescription.Text = row.Cells["Description"]?.Value?.ToString() ?? string.Empty;
             }
         }
 
         private void bttDelete_Click(object sender, EventArgs e)
         {
-            using ( SqlConnection cn = new SqlConnection(con) )
+            using (SqlConnection cn = new SqlConnection(con))
             {
-                SqlCommand cmd = new SqlCommand($"Update Proyectos set Id_Estado = 4 WHERE Id_Proyecto = {txtId.Text}", cn);
+                // Se actualiza la actividad para marcarla como eliminada (estado 4)
+                SqlCommand cmd = new SqlCommand($@"
+                    UPDATE projects 
+                    SET idState = 4 
+                    WHERE idProject = {txtId.Text}
+                ", cn);
 
                 cmd.CommandType = CommandType.Text;
-
                 cn.Open();
-
                 cmd.ExecuteNonQuery();
 
-                MessageBox.Show("Ejecutado Correctamente", "Exito", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
+                MessageBox.Show("Ejecutado Correctamente", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 Limpieza();
             }
         }

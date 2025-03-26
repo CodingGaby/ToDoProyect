@@ -12,10 +12,9 @@ using System.Windows.Forms;
 
 namespace ToDoProyect.Pages.CRUD
 {
-    public partial class ActivityCRUD: Form
+    public partial class ActivityCRUD : Form
     {
-        string con = "Data Source=LAPTOP-P6SV6G8N;Initial Catalog=ToDoProyect;Integrated Security=True;Encrypt=False";
-
+        string con = Program.getConnectionString();
         public ActivityCRUD()
         {
             InitializeComponent();
@@ -33,15 +32,15 @@ namespace ToDoProyect.Pages.CRUD
 
         private bool _VerifyData()
         {
+            // Expresión regular para el formato dd/MM/yyyy
             string regexDate = @"^\b(0[1-9]|[12][0-9]|3[01])/(0[1-9]|1[0-2])/([0-9]{4})\b$";
 
-            bool ValidDateIn = Regex.IsMatch(txtDateIn.Text, regexDate);
-            bool ValidDateLast = Regex.IsMatch(txtDateLast.Text, regexDate);
+            bool validDateIn = Regex.IsMatch(txtDateIn.Text, regexDate);
+            bool validDateLast = Regex.IsMatch(txtDateLast.Text, regexDate);
 
-            if ( !ValidDateIn || !ValidDateIn )
+            if (!validDateIn || !validDateLast)
             {
-                MessageBox.Show("Formato de Fecha Erroneo", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-
+                MessageBox.Show("Formato de Fecha Erróneo", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
 
@@ -50,128 +49,131 @@ namespace ToDoProyect.Pages.CRUD
 
         private void ActivityCRUD_Load(object sender, EventArgs e)
         {
-            // TODO: esta línea de código carga datos en la tabla 'toDoProyectDataSet3.Proyectos' Puede moverla o quitarla según sea necesario.
-            this.proyectosTableAdapter2.Fill(this.toDoProyectDataSet3.Proyectos);
-            // TODO: esta línea de código carga datos en la tabla 'toDoProyectDataSet1.Proyectos' Puede moverla o quitarla según sea necesario.
-            this.proyectosTableAdapter1.Fill(this.toDoProyectDataSet1.Proyectos);
-            // TODO: esta línea de código carga datos en la tabla 'toDoProyectDataSet2.Usuarios' Puede moverla o quitarla según sea necesario.
-            this.usuariosTableAdapter.Fill(this.toDoProyectDataSet2.Usuarios);
-            // TODO: esta línea de código carga datos en la tabla 'toDoProyectDataSet2.EstadoActividades' Puede moverla o quitarla según sea necesario.
-            this.estadoActividadesTableAdapter.Fill(this.toDoProyectDataSet2.EstadoActividades);
-
+            // TODO: esta línea de código carga datos en la tabla 'trelloProyectDBDataSet.projectsView' Puede moverla o quitarla según sea necesario.
+            this.projectsViewTableAdapter.Fill(this.trelloProyectDBDataSet.projectsView);
+            // Estas líneas cargan los datos en los DataSet. Asegúrate de que estén configurados
+            // para la nueva estructura de tablas y vistas (activities, projects, activityStates, users, activitiesView)
+            this.activitiesViewTableAdapter.Fill(this.trelloProyectDBDataSet.activitiesView);
+            this.usersTableAdapter.Fill(this.trelloProyectDBDataSet.users);
+            this.activityStatesTableAdapter.Fill(this.trelloProyectDBDataSet.activityStates);
+            this.projectsTableAdapter.Fill(this.trelloProyectDBDataSet.projects);
+            this.activitiesTableAdapter.Fill(this.trelloProyectDBDataSet.activities);
         }
 
         private void dataView_CellClick(object sender, DataGridViewCellEventArgs e)
         {
-            if ( e.RowIndex >= 0 )
+            if (e.RowIndex >= 0)
             {
-                var row = dataView.Rows[ e.RowIndex ];
+                var row = dataView.Rows[e.RowIndex];
 
-                // Verificar si las celdas no son null antes de asignar
-                txtId.Text = row.Cells[ "ID" ]?.Value?.ToString() ?? string.Empty;
-                txtName.Text = row.Cells[ "Nombre de la Actividad" ]?.Value?.ToString() ?? string.Empty;
-                txtDateIn.Text = row.Cells[ "Fecha ingreso" ]?.Value?.ToString() ?? string.Empty;
-                txtDateLast.Text = row.Cells[ "Fecha entrega" ]?.Value?.ToString() ?? string.Empty;
-                txtDescription.Text = row.Cells[ "Descripcion" ]?.Value?.ToString() ?? string.Empty;
-                txtUrl.Text = row.Cells[ "URL del Documento" ]?.Value?.ToString() ?? string.Empty;
-
-                if ( int.TryParse(row.Cells[ "Estado" ]?.Value?.ToString(), out int statusId) )
-                {
-                    cmbEstatus.SelectedIndex = statusId - 1;
-                }
+                // Se usan los alias definidos en la vista activitiesView:
+                txtId.Text = row.Cells["iDDataGridViewTextBoxColumn"]?.Value?.ToString() ?? string.Empty;
+                txtName.Text = row.Cells["activityNameDataGridViewTextBoxColumn"]?.Value?.ToString() ?? string.Empty;
+                txtDateIn.Text = row.Cells["startDateDataGridViewTextBoxColumn"]?.Value?.ToString() ?? string.Empty;
+                txtDateLast.Text = row.Cells["deliveryDateDataGridViewTextBoxColumn"]?.Value?.ToString() ?? string.Empty;
+                txtDescription.Text = row.Cells["descriptionDataGridViewTextBoxColumn"]?.Value?.ToString() ?? string.Empty;
+                txtUrl.Text = row.Cells["documentURLDataGridViewTextBoxColumn"]?.Value?.ToString() ?? string.Empty;
+                cmbEstatus.Text = row.Cells["stateDataGridViewTextBoxColumn"]?.Value?.ToString() ?? string.Empty;
+                cmbProject.Text = row.Cells["projectNameDataGridViewTextBoxColumn"]?.Value?.ToString() ?? string.Empty;
+                cmbUser.Text = row.Cells["userNameDataGridViewTextBoxColumn"]?.Value?.ToString() ?? string.Empty;
+                Console.WriteLine(row.Cells["projectIDDataGridViewTextBoxColumn"]?.Value);
+                Console.WriteLine(row.Cells["projectIDDataGridViewTextBoxColumn"]?.Value?.GetType());
             }
         }
 
         private void bttViewData_Click(object sender, EventArgs e)
         {
-            //Console.WriteLine(cmbProject.SelectedIndex + 1);
-
             DataTable dt = new DataTable();
 
-            using ( SqlConnection cn = new SqlConnection(con) )
+            using (SqlConnection cn = new SqlConnection(con))
             {
-                SqlDataAdapter da = new SqlDataAdapter($"SELECT * FROM ActividadesView", cn);
-
+                // Se actualiza la consulta para usar la vista activitiesView
+                SqlDataAdapter da = new SqlDataAdapter("SELECT * FROM activitiesView", cn);
                 da.SelectCommand.CommandType = CommandType.Text;
 
                 cn.Open();
-
                 da.Fill(dt);
-
                 dataView.DataSource = dt;
             }
         }
 
         private void bttAdd_Click(object sender, EventArgs e)
         {
-            if ( _VerifyData() )
+            if (_VerifyData())
             {
-
-                using ( SqlConnection cn = new SqlConnection(con) )
+                using (SqlConnection cn = new SqlConnection(con))
                 {
-
-                    SqlCommand cmd = new SqlCommand($"INSERT INTO Actividades(Nombre, FechaIn, FechaEntrega, descripcion, URLDocument, Id_Proyecto, Id_User, Id_Estado) VALUES ('{txtName.Text}','{txtDateIn.Text}','{txtDateLast.Text}','{txtDescription.Text}', '{txtUrl.Text}', {cmbProject.SelectedIndex + 1}, {cmbUser.SelectedIndex + 1}, {cmbEstatus.SelectedIndex + 1})", cn);
-                    cmd.CommandType = CommandType.Text; // Codigo Miss - cmd.CommandType cn = CommandType.Text;
+                    // Inserta en la tabla activities usando la nueva estructura
+                    SqlCommand cmd = new SqlCommand($@"
+                        INSERT INTO activities(name, startDate, deliveryDate, description, urlDocument, idProject, idUser, idState)
+                        VALUES ('{txtName.Text}', '{txtDateIn.Text}', '{txtDateLast.Text}', '{txtDescription.Text}', '{txtUrl.Text}', 
+                                {cmbProject.SelectedIndex + 1}, {cmbUser.SelectedIndex + 1}, {cmbEstatus.SelectedIndex + 1})
+                    ", cn);
+                    cmd.CommandType = CommandType.Text;
 
                     cn.Open();
                     cmd.ExecuteNonQuery();
 
-                    MessageBox.Show("Ejecutado Correctamente", "Exito", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
+                    MessageBox.Show("Ejecutado Correctamente", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     Limpieza();
-
                 }
             }
         }
 
         private void bttModify_Click(object sender, EventArgs e)
         {
-            if ( _VerifyData() )
+            if (_VerifyData())
             {
-
-                using ( SqlConnection cn = new SqlConnection(con) )
+                using (SqlConnection cn = new SqlConnection(con))
                 {
-                    //if ( _VerifyMail() )
-                    //{
-                    SqlCommand cmd = new SqlCommand($"Update Actividades set Nombre = '{txtName.Text}', FechaIn = '{txtDateIn.Text}', FechaEntrega = '{txtDateLast.Text}', descripcion = '{txtDescription.Text}', URLDocument = '{txtUrl.Text}', Id_Proyecto = {cmbProject.SelectedIndex + 1}, Id_User = {cmbUser.SelectedIndex + 1}, Id_Estado = {( cmbEstatus.SelectedIndex + 1 )} WHERE Id_Actividad = {txtId.Text}", cn);
+                    // Actualiza la actividad en la tabla activities
+                    SqlCommand cmd = new SqlCommand($@"
+                        UPDATE activities 
+                        SET name = '{txtName.Text}', 
+                            startDate = '{txtDateIn.Text}', 
+                            deliveryDate = '{txtDateLast.Text}', 
+                            description = '{txtDescription.Text}', 
+                            urlDocument = '{txtUrl.Text}', 
+                            idProject = {cmbProject.SelectedIndex + 1}, 
+                            idUser = {cmbUser.SelectedIndex + 1}, 
+                            idState = {cmbEstatus.SelectedIndex + 1} 
+                        WHERE idActivity = {txtId.Text}
+                    ", cn);
 
                     cmd.CommandType = CommandType.Text;
-
                     cn.Open();
-
                     cmd.ExecuteNonQuery();
 
-                    MessageBox.Show("Ejecutado Correctamente", "Exito", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
+                    MessageBox.Show("Ejecutado Correctamente", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     Limpieza();
-                    //}
                 }
             }
         }
 
         private void bttDelete_Click(object sender, EventArgs e)
         {
-            using ( SqlConnection cn = new SqlConnection(con) )
+            using (SqlConnection cn = new SqlConnection(con))
             {
-                SqlCommand cmd = new SqlCommand($"Update Actividades set Id_Estado = 4 WHERE Id_Actividad = {txtId.Text}", cn);
+                // Marca la actividad como eliminada (estado 4) en la tabla activities
+                SqlCommand cmd = new SqlCommand($@"
+                    UPDATE activities 
+                    SET idState = 4 
+                    WHERE idActivity = {txtId.Text}
+                ", cn);
 
                 cmd.CommandType = CommandType.Text;
-
                 cn.Open();
-
                 cmd.ExecuteNonQuery();
 
-                MessageBox.Show("Ejecutado Correctamente", "Exito", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
+                MessageBox.Show("Ejecutado Correctamente", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 Limpieza();
             }
         }
 
         private void bttBack_Click(object sender, EventArgs e)
         {
-            string a = "";
             Hide();
-            new AdminPage(a).Show();
+            new AdminPage(string.Empty).Show();
         }
     }
 }

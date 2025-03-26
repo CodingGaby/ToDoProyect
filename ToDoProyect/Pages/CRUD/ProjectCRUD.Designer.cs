@@ -39,13 +39,14 @@
             this.dataView = new System.Windows.Forms.DataGridView();
             this.label8 = new System.Windows.Forms.Label();
             this.cmbEstatus = new System.Windows.Forms.ComboBox();
+            this.projectStatesBindingSource = new System.Windows.Forms.BindingSource(this.components);
+            this.trelloProyectDBDataSet = new ToDoProyect.TrelloProyectDBDataSet();
             this.estadosProyectosBindingSource1 = new System.Windows.Forms.BindingSource(this.components);
-            this.toDoProyectDataSet1 = new ToDoProyect.ToDoProyectDataSet1();
             this.label3 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.estadosProyectosBindingSource = new System.Windows.Forms.BindingSource(this.components);
-            this.estadosProyectosTableAdapter = new ToDoProyect.ToDoProyectDataSet1TableAdapters.EstadosProyectosTableAdapter();
+            this.estadosProyectosTableAdapter = new ToDoProyect.TrelloProyectDBDataSetTableAdapters.projectStatesTableAdapter();
             this.txtDescription = new System.Windows.Forms.RichTextBox();
             this.bttBack = new System.Windows.Forms.Button();
             this.txtDateLast = new System.Windows.Forms.TextBox();
@@ -54,8 +55,9 @@
             this.txtName = new System.Windows.Forms.TextBox();
             this.label5 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.dataView)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.projectStatesBindingSource)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.trelloProyectDBDataSet)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.estadosProyectosBindingSource1)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.toDoProyectDataSet1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.estadosProyectosBindingSource)).BeginInit();
             this.SuspendLayout();
             // 
@@ -146,24 +148,29 @@
             // 
             // cmbEstatus
             // 
-            this.cmbEstatus.DataSource = this.estadosProyectosBindingSource1;
-            this.cmbEstatus.DisplayMember = "Nombre";
+            this.cmbEstatus.DataSource = this.projectStatesBindingSource;
+            this.cmbEstatus.DisplayMember = "name";
             this.cmbEstatus.FormattingEnabled = true;
             this.cmbEstatus.Location = new System.Drawing.Point(428, 108);
             this.cmbEstatus.Name = "cmbEstatus";
             this.cmbEstatus.Size = new System.Drawing.Size(121, 21);
             this.cmbEstatus.TabIndex = 39;
-            this.cmbEstatus.ValueMember = "Id_Estado";
+            this.cmbEstatus.ValueMember = "idState";
+            // 
+            // projectStatesBindingSource
+            // 
+            this.projectStatesBindingSource.DataMember = "projectStates";
+            this.projectStatesBindingSource.DataSource = this.trelloProyectDBDataSet;
+            // 
+            // trelloProyectDBDataSet
+            // 
+            this.trelloProyectDBDataSet.DataSetName = "ToDoProyectDataSet1";
+            this.trelloProyectDBDataSet.SchemaSerializationMode = System.Data.SchemaSerializationMode.IncludeSchema;
             // 
             // estadosProyectosBindingSource1
             // 
-            this.estadosProyectosBindingSource1.DataMember = "EstadosProyectos";
-            this.estadosProyectosBindingSource1.DataSource = this.toDoProyectDataSet1;
-            // 
-            // toDoProyectDataSet1
-            // 
-            this.toDoProyectDataSet1.DataSetName = "ToDoProyectDataSet1";
-            this.toDoProyectDataSet1.SchemaSerializationMode = System.Data.SchemaSerializationMode.IncludeSchema;
+            this.estadosProyectosBindingSource1.DataMember = "projectStates";
+            this.estadosProyectosBindingSource1.DataSource = this.trelloProyectDBDataSet;
             // 
             // label3
             // 
@@ -189,14 +196,14 @@
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label1.Location = new System.Drawing.Point(83, 41);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(200, 31);
+            this.label1.Size = new System.Drawing.Size(113, 31);
             this.label1.TabIndex = 26;
-            this.label1.Text = "CRUD Projects";
+            this.label1.Text = "Projects";
             // 
             // estadosProyectosBindingSource
             // 
-            this.estadosProyectosBindingSource.DataMember = "EstadosProyectos";
-            this.estadosProyectosBindingSource.DataSource = this.toDoProyectDataSet1;
+            this.estadosProyectosBindingSource.DataMember = "projectStates";
+            this.estadosProyectosBindingSource.DataSource = this.trelloProyectDBDataSet;
             // 
             // estadosProyectosTableAdapter
             // 
@@ -289,8 +296,9 @@
             this.Text = "ProjectCRUD";
             this.Load += new System.EventHandler(this.ProjectCRUD_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dataView)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.projectStatesBindingSource)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.trelloProyectDBDataSet)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.estadosProyectosBindingSource1)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.toDoProyectDataSet1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.estadosProyectosBindingSource)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -311,9 +319,9 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label1;
-        private ToDoProyectDataSet1 toDoProyectDataSet1;
+        private TrelloProyectDBDataSet trelloProyectDBDataSet;
         private System.Windows.Forms.BindingSource estadosProyectosBindingSource;
-        private ToDoProyectDataSet1TableAdapters.EstadosProyectosTableAdapter estadosProyectosTableAdapter;
+        private TrelloProyectDBDataSetTableAdapters.projectStatesTableAdapter estadosProyectosTableAdapter;
         private System.Windows.Forms.RichTextBox txtDescription;
         private System.Windows.Forms.Button bttBack;
         private System.Windows.Forms.BindingSource estadosProyectosBindingSource1;
@@ -322,5 +330,6 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.TextBox txtName;
         private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.BindingSource projectStatesBindingSource;
     }
 }

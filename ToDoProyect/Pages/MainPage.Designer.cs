@@ -40,7 +40,7 @@
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 30F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(389, 77);
+            this.label1.Location = new System.Drawing.Point(12, 53);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(274, 46);
             this.label1.TabIndex = 0;
@@ -50,7 +50,7 @@
             // 
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.Location = new System.Drawing.Point(371, 264);
+            this.label2.Location = new System.Drawing.Point(111, 125);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(79, 25);
             this.label2.TabIndex = 1;
@@ -60,7 +60,7 @@
             // 
             this.label3.AutoSize = true;
             this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 15F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label3.Location = new System.Drawing.Point(371, 316);
+            this.label3.Location = new System.Drawing.Point(103, 176);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(114, 25);
             this.label3.TabIndex = 2;
@@ -68,34 +68,36 @@
             // 
             // txtUser
             // 
-            this.txtUser.Location = new System.Drawing.Point(523, 264);
+            this.txtUser.Location = new System.Drawing.Point(75, 153);
             this.txtUser.Name = "txtUser";
             this.txtUser.Size = new System.Drawing.Size(160, 20);
             this.txtUser.TabIndex = 3;
             // 
             // txtPassword
             // 
-            this.txtPassword.Location = new System.Drawing.Point(523, 316);
+            this.txtPassword.Location = new System.Drawing.Point(75, 204);
             this.txtPassword.Name = "txtPassword";
             this.txtPassword.Size = new System.Drawing.Size(160, 20);
             this.txtPassword.TabIndex = 4;
             // 
             // bttLogIn
             // 
+            this.bttLogIn.BackColor = System.Drawing.SystemColors.ActiveCaption;
             this.bttLogIn.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.bttLogIn.Location = new System.Drawing.Point(480, 417);
+            this.bttLogIn.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
+            this.bttLogIn.Location = new System.Drawing.Point(108, 266);
             this.bttLogIn.Name = "bttLogIn";
             this.bttLogIn.Size = new System.Drawing.Size(101, 29);
             this.bttLogIn.TabIndex = 5;
-            this.bttLogIn.Text = "Aceptar";
-            this.bttLogIn.UseVisualStyleBackColor = true;
+            this.bttLogIn.Text = "LogIn";
+            this.bttLogIn.UseVisualStyleBackColor = false;
             this.bttLogIn.Click += new System.EventHandler(this.bttLogIn_Click);
             // 
             // MainPage
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1040, 635);
+            this.ClientSize = new System.Drawing.Size(309, 339);
             this.Controls.Add(this.bttLogIn);
             this.Controls.Add(this.txtPassword);
             this.Controls.Add(this.txtUser);
